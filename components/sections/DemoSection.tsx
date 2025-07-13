@@ -1,4 +1,5 @@
 import { MessageCircle, Play } from 'lucide-react';
+import Button from '../ui/Button';
 
 export default function DemoSection() {
   return (
@@ -46,10 +47,9 @@ export default function DemoSection() {
               </div>
               
               <div className="flex items-center justify-center">
-                <button className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-50 transition-all transform hover:scale-105 flex items-center space-x-2 font-semibold shadow-lg">
-                  <Play className="w-5 h-5" />
-                  <span>Start Demo</span>
-                </button>
+                <Button variant="primary" icon={Play} bookingType="demo" className="bg-white text-blue-600 hover:bg-gray-50">
+                  Start Demo
+                </Button>
               </div>
             </div>
           </div>
