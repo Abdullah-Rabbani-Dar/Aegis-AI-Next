@@ -1,4 +1,5 @@
 import PricingCard from '../ui/PricingCard';
+import Button from '../ui/Button';
 
 export default function PricingSection() {
   const pricingPlans = [
@@ -8,7 +9,7 @@ export default function PricingSection() {
       period: "/month",
       description: "Perfect for small businesses",
       features: [
-        "500 minutes included",
+        "Free 500 minutes/month",
         "Basic voice recognition",
         "Email support",
         "Custom voice agents",
@@ -22,7 +23,7 @@ export default function PricingSection() {
       period: "/month",
       description: "Ideal for growing companies",
       features: [
-        "1000 minutes included",
+        "Free 1000 minutes/month",
         "Advanced AI capabilities",
         "Priority support",
         "Custom voice agents",
@@ -36,7 +37,7 @@ export default function PricingSection() {
       period: "pricing",
       description: "For large organizations",
       features: [
-        "Lower minutes cost",
+        "Unlimited minutes",
         "Custom AI training",
         "24/7 dedicated support",
         "Unlimited agents",

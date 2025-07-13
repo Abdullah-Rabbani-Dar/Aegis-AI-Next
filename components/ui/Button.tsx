@@ -1,5 +1,6 @@
 import React from 'react';
 import { DivideIcon as LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -7,6 +8,8 @@ interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
   onClick?: () => void;
+  href?: string;
+  bookingType?: 'demo' | 'call' | 'sales';
   className?: string;
   disabled?: boolean;
 }
@@ -17,6 +20,8 @@ export default function Button({
   size = 'md',
   icon: Icon,
   onClick,
+  href,
+  bookingType,
   className = '',
   disabled = false
 }: ButtonProps) {
@@ -36,6 +41,27 @@ export default function Button({
   
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
   
+  // Handle booking buttons
+  if (bookingType) {
+    return (
+      <Link href={`/booking?type=${bookingType}`} className={classes}>
+        {Icon && <Icon className="w-5 h-5" />}
+        <span>{children}</span>
+      </Link>
+    );
+  }
+
+  // Handle regular links
+  if (href) {
+    return (
+      <Link href={href} className={classes}>
+        {Icon && <Icon className="w-5 h-5" />}
+        <span>{children}</span>
+      </Link>
+    );
+  }
+
+  // Handle regular buttons
   return (
     <button
       className={classes}

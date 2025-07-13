@@ -21,10 +21,10 @@ export default function HeroSection() {
           </div>
           <div className="slide-in-right">
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button variant="primary" icon={Play} className="animate-pulse-glow">
+              <Button variant="primary" icon={Play} bookingType="demo" className="animate-pulse-glow">
                 Try Live Demo
               </Button>
-              <Button variant="outline" icon={Phone}>
+              <Button variant="outline" icon={Phone} bookingType="call">
                 Book a Call
               </Button>
             </div>

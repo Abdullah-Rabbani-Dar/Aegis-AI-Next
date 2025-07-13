@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import Button from './Button';
 
 interface PricingCardProps {
   name: string;
@@ -18,9 +19,18 @@ export default function PricingCard({
   features,
   popular = false
 }: PricingCardProps) {
+  const getBookingType = () => {
+    if (name === 'Enterprise') return 'sales';
+    return 'call';
+  };
+
+  const getButtonText = () => {
+    if (name === 'Enterprise') return 'Contact Sales';
+    return 'Get Started';
+  };
   return (
     <div
-      className={`bg-white/50 backdrop-blur-lg rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-200/30 ${
+      className={`bg-white/70 backdrop-blur-lg rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-200/30 ${
         popular ? 'ring-2 ring-blue-600 relative animate-pulse-glow' : ''
       }`}
     >
@@ -50,15 +60,13 @@ export default function PricingCard({
         ))}
       </ul>
       
-      <button
-        className={`w-full py-3 rounded-lg font-semibold transition-all ${
-          popular
-            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
-            : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-        }`}
+      <Button
+        variant={popular ? 'primary' : 'secondary'}
+        bookingType={getBookingType()}
+        className="w-full"
       >
-        {name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
-      </button>
+        {getButtonText()}
+      </Button>
     </div>
   );
 }
