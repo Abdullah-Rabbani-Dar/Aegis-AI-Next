@@ -26,11 +26,11 @@ const BookingSchema = new Schema<IBooking>({
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
   contact: {
-    type: String,
-    required: [true, 'Contact number is required'],
-    trim: true,
-    match: [/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid contact number']
-  },
+  type: String,
+  required: [true, 'Contact number is required'],
+  trim: true,
+  match: [/^(\+\d{1,3})?[\s\-\(\)]?[\d\s\-\(\)]{6,20}$/, 'Please enter a valid contact number']
+},
   companyName: {
     type: String,
     required: [true, 'Company name is required'],

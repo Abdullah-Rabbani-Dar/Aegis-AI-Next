@@ -10,14 +10,14 @@ export function useScrollAnimation() {
     
     elements.forEach((element, index) => {
       const rect = element.getBoundingClientRect();
-      const isVisible = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+      const isVisible = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
       
       if (isVisible && !element.classList.contains('animate-in')) {
         // Add staggered delay for card animations
         if (element.classList.contains('stagger-animation')) {
           setTimeout(() => {
             element.classList.add('animate-in');
-          }, index * 50);
+          }, index * 100);
         } else {
           element.classList.add('animate-in');
         }
@@ -46,13 +46,28 @@ export function useScrollAnimation() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
+            if (entry.target.classList.contains('stagger-animation')) {
+              // Handle staggered animations for cards
+              const parent = entry.target.closest('section') || entry.target.parentElement;
+              const siblings = parent?.querySelectorAll('.stagger-animation') || [];
+              const index = Array.from(siblings).indexOf(entry.target as Element);
+              
+              // Faster animation for features section
+              const isFeatureSection = parent?.id === 'features';
+              const delay = isFeatureSection ? index * 80 : index * 150;
+              
+              setTimeout(() => {
+                entry.target.classList.add('animate-in');
+              }, delay);
+            } else {
+              entry.target.classList.add('animate-in');
+            }
           }
         });
       },
       { 
         threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        rootMargin: '0px 0px -50px 0px'
       }
     );
 
@@ -60,8 +75,8 @@ export function useScrollAnimation() {
     const sections = document.querySelectorAll('section[id]');
     sections.forEach((section) => sectionObserver.observe(section));
 
-    // Observe elements for animations
-    const animatedElements = document.querySelectorAll('.scroll-reveal, .fade-in, .scale-in');
+    // Observe all animated elements
+    const animatedElements = document.querySelectorAll('.scroll-reveal, .stagger-animation, .slide-in-left, .slide-in-right, .fade-in, .scale-in');
     animatedElements.forEach((element) => animationObserver.observe(element));
 
     // Handle scroll for staggered animations
@@ -69,7 +84,16 @@ export function useScrollAnimation() {
       requestAnimationFrame(animateElements);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Throttle scroll events for better performance
+    let scrollTimeout: NodeJS.Timeout;
+    const throttledScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        handleScroll();
+      }, 16); // ~60fps
+    };
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
     
     // Initial animation check
     animateElements();
@@ -77,7 +101,8 @@ export function useScrollAnimation() {
     return () => {
       sectionObserver.disconnect();
       animationObserver.disconnect();
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', throttledScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
     };
   }, [animateElements]);
 

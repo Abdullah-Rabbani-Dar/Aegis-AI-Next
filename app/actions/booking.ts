@@ -2,6 +2,7 @@
 
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
+import { sendBookingEmails } from '@/lib/email';
 import { redirect } from 'next/navigation';
 
 export interface BookingFormData {
@@ -39,6 +40,17 @@ export async function createBooking(formData: FormData) {
     await booking.save();
 
     console.log('Booking created successfully:', booking._id);
+
+    // Send email notifications
+    try {
+      const emailResult = await sendBookingEmails({
+        ...bookingData,
+        createdAt: booking.createdAt.toISOString()
+      });
+    } catch (emailError) {
+      console.error('Failed to send email notifications:', emailError);
+      // Don't throw error here - booking was successful, email is secondary
+    }
     
   } catch (error: any) {
     console.error('Error creating booking:', error);
@@ -57,5 +69,23 @@ export async function getAllBookings() {
   } catch (error) {
     console.error('Error fetching bookings:', error);
     throw new Error('Failed to fetch bookings');
+  }
+}
+
+export async function deleteBooking(bookingId: string) {
+  try {
+    await connectDB();
+    
+    const deletedBooking = await Booking.findByIdAndDelete(bookingId);
+    
+    if (!deletedBooking) {
+      throw new Error('Booking not found');
+    }
+
+    console.log('Booking deleted successfully:', bookingId);
+    return { success: true, message: 'Booking deleted successfully' };
+  } catch (error: any) {
+    console.error('Error deleting booking:', error);
+    throw new Error(error.message || 'Failed to delete booking');
   }
 }
