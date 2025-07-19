@@ -165,7 +165,7 @@ export default function BookingForm() {
     formData.append('bookingType', bookingType);
     
     // Show loading snackbar immediately
-    showSnackbar('loading', 'Submitting your booking...');
+    // showSnackbar('loading', 'Submitting your booking...');
     
     startTransition(async () => {
       try {
@@ -174,7 +174,7 @@ export default function BookingForm() {
         console.log('createBooking completed successfully');
         
         // Show success message - the redirect will happen after this
-        showSnackbar('success', 'Booking submitted successfully! Redirecting...');
+        // showSnackbar('success', 'Booking submitted successfully! Redirecting...');
         
       } catch (error: unknown) {
         console.error('Booking error:', error);
