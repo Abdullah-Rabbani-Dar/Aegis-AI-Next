@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { checkAuth, logoutAdmin } from '@/app/actions/auth';
-import { getAllBookings } from '@/app/actions/booking';
-import { Calendar, Mail, Phone, Building, Users, LogOut, Loader } from 'lucide-react';
+import { getAllBookings, deleteBooking } from '@/app/actions/booking';
+import { Calendar, Mail, Phone, Building, Users, LogOut, Loader, Trash2, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import NotificationEmailsSection from '@/components/admin/NotificationEmailsSection';
 
 interface Booking {
   _id: string;
@@ -21,6 +22,8 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState<any>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'bookings' | 'emails'>('bookings');
   const router = useRouter();
 
   useEffect(() => {
@@ -50,6 +53,23 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await logoutAdmin();
+  };
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingId(bookingId);
+    try {
+      await deleteBooking(bookingId);
+      // Remove the booking from the local state
+      setBookings(bookings.filter(booking => booking._id !== bookingId));
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete booking');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -105,6 +125,36 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Tabs */}
+        <div className="mb-8">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('bookings')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'bookings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-2" />
+              Bookings
+            </button>
+            <button
+              onClick={() => setActiveTab('emails')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'emails'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Settings className="w-4 h-4 inline mr-2" />
+              Notification Emails
+            </button>
+          </nav>
+        </div>
+
+        {activeTab === 'bookings' && (
+          <>
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -183,6 +233,9 @@ export default function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -217,6 +270,21 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(booking.createdAt)}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button
+                        onClick={() => handleDeleteBooking(booking._id)}
+                        disabled={deletingId === booking._id}
+                        className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                        title="Delete booking"
+                      >
+                        {deletingId === booking._id ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        <span className="sr-only">Delete</span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -229,6 +297,12 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
+          </>
+        )}
+
+        {activeTab === 'emails' && (
+          <NotificationEmailsSection />
+        )}
       </main>
     </div>
   );
