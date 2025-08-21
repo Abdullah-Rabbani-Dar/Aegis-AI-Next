@@ -49,7 +49,7 @@ export async function sendBookingEmails(bookingData: BookingEmailData) {
     if (internalEmailAddresses.length > 0) {
       emailPromises.push(
         resend.emails.send({
-          from:'anythingresend.dev',
+          from:'anything@resend.dev',
           to: internalEmailAddresses,
           subject: `New ${getBookingTypeLabel(bookingData.bookingType)} Booking - ${bookingData.name}`,
           html: internalEmailHtml,
